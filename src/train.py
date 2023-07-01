@@ -26,7 +26,18 @@ from transformers import Trainer
 from datasets import load_dataset
 import utils
 
-#from peft import LoraConfig, get_peft_model
+### newly added import:
+from peft import LoraConfig, get_peft_model
+def print_trainable_parameters(model):
+    trainable_params = 0
+    all_param = 1 # avoid dividing-by-zero
+    for _, param in model.named_parameters():
+        all_param += param.numel()
+        if param.requires_grad:
+            trainable_params += param.numel()
+    print(
+        f"trainable params: {trainable_params:,} || all params: {all_param:,} || trainable%: {100 * trainable_params / all_param:,}"
+    )
 
 IGNORE_INDEX = -100
 DEFAULT_PAD_TOKEN = "[PAD]"
@@ -174,15 +185,29 @@ def train_tokenize_function(examples, tokenizer):
     targets = [f"{output}{tokenizer.eos_token}" for output in examples['output']]
     data_dict = preprocess(sources, targets, tokenizer)
     return data_dict
-              
+
 def train():
     parser = transformers.HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
-        
+
     model = transformers.AutoModelForCausalLM.from_pretrained(
         model_args.model_name_or_path,
         cache_dir=training_args.cache_dir,
     )
+
+    if False: # enable Lora?
+        TARGET_MODULES = [
+            "q_proj",
+            "v_proj",
+        ]
+        lora_config = LoraConfig(
+            task_type="CAUSAL_LM",
+            r=8, lora_dropout=0.05,
+            lora_alpha=16, bias='none',
+            target_modules=TARGET_MODULES,
+        )
+        model = get_peft_model(model, lora_config)
+        print_trainable_parameters(model)
 
     tokenizer = transformers.AutoTokenizer.from_pretrained(
         model_args.model_name_or_path,

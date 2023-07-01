@@ -3,15 +3,16 @@ export NCCL_BLOCKING_WAIT=1  # Set this variable to use the NCCL backend
 export NCCL_IB_DISABLE=1
 export NCCL_DEBUG=INFO
 export NCCL_P2P_DISABLE=1
-export TORCH_DISTRIBUTED_DEBUG=OFF #DETAIL
+export TORCH_DISTRIBUTED_DEBUG=DETAIL
+#export TORCH_DISTRIBUTED_DEBUG=OFF
 
-	#--hostfile configs/hostfile \
-	#--num_gpus 8 \
-	#--num_nodes 1 \
+#--hostfile configs/hostfile \
+#--num_gpus 8 \
+#--num_nodes 1 \
 deepspeed \
 	--master_port 8900 \
 	train.py \
-	--model_name_or_path ~/llama-models/30B-hgf/ \
+	--model_name_or_path ~/llama-models/7B-hgf/ \
 	--data_path ../data/alpaca_data.json \
 	--output_dir ./output/ \
 	--num_train_epochs 3 \
