@@ -6,6 +6,7 @@ cd Llama-X
 
 pip3 install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu118
 python -c 'import torch; print(torch.cuda.is_available())'
+python -c "import torch; print(torch.__version__)"
 pip install transformers==4.29.2
 pip install -r requirements.txt
 
