@@ -11,7 +11,7 @@ export TORCH_DISTRIBUTED_DEBUG=OFF #DETAIL
 deepspeed \
 	--master_port 8900 \
 	train.py \
-	--model_name_or_path ~/llama-models/7B-hgf/ \
+	--model_name_or_path ~/llama-models/30B-hgf/ \
 	--data_path ../data/alpaca_data.json \
 	--output_dir ./output/ \
 	--num_train_epochs 3 \

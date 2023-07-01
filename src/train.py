@@ -26,6 +26,8 @@ from transformers import Trainer
 from datasets import load_dataset
 import utils
 
+#from peft import LoraConfig, get_peft_model
+
 IGNORE_INDEX = -100
 DEFAULT_PAD_TOKEN = "[PAD]"
 DEFAULT_EOS_TOKEN = "</s>"
