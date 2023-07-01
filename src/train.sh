@@ -1,8 +1,15 @@
+export CUDA_VISIBLE_DEVICES=0,1,2,3
+export NCCL_BLOCKING_WAIT=1  # Set this variable to use the NCCL backend
+export NCCL_IB_DISABLE=1
+export NCCL_DEBUG=INFO
+export NCCL_P2P_DISABLE=1
+export TORCH_DISTRIBUTED_DEBUG=OFF #DETAIL
+
 	#--hostfile configs/hostfile \
+	#--num_gpus 8 \
+	#--num_nodes 1 \
 deepspeed \
-	--num_gpus 8 \
-	--num_nodes 1 \
-	--master_port 8921 \
+	--master_port 8900 \
 	train.py \
 	--model_name_or_path ~/llama-models/7B-hgf/ \
 	--data_path ../data/alpaca_data.json \

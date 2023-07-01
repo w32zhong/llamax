@@ -26,7 +26,6 @@ https://gist.github.com/w32zhong/9bf98e3d9aa9b32854d1e389cdf3d666#file-llama-sh-
 - Train LLaMA-7B on DeepSpeed Zero-3:
 ```bash
 ps -up `nvidia-smi -q -x | grep -Po '(?<=<pid>)[0-9]+'`
-export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 ./train.sh
 ```
 
