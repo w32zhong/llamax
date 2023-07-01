@@ -10,8 +10,9 @@ python -c "import torch; print(torch.__version__)"
 pip install transformers==4.29.2
 pip install -r requirements.txt
 
-#conda install -c "nvidia/label/cuda-12.1.1" cuda 
-#nvcc --version
+# conda install -c "nvidia/label/cuda-12.1.1" cuda 
+# nvcc --version
+# pip install deepspeed==0.9.5
 ```
 
 - Training data example (e.g., [Stanford Alpaca](https://github.com/tatsu-lab/stanford_alpaca/blob/main/alpaca_data.json)):
