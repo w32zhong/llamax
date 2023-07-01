@@ -7,9 +7,10 @@ cd Llama-X
 pip3 install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu118
 python -c 'import torch; print(torch.cuda.is_available())'
 pip install transformers==4.29.2
+pip install -r requirements.txt
 
 conda install -c "nvidia/label/cuda-12.1.1" cuda # other versions will stuck on watgpu-100 node! Thanks Tunde!
-pip install -r requirements.txt
+nvcc --version
 ```
 
 - Training data example (e.g., [Stanford Alpaca](https://github.com/tatsu-lab/stanford_alpaca/blob/main/alpaca_data.json)):
