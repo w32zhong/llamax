@@ -1,4 +1,9 @@
-deepspeed train.py \
+	#--hostfile configs/hostfile \
+deepspeed \
+	--num_gpus 8 \
+	--num_nodes 1 \
+	--master_port 8921 \
+	train.py \
 	--model_name_or_path ~/llama-models/7B-hgf/ \
 	--data_path ../data/alpaca_data.json \
 	--output_dir ./output/ \
