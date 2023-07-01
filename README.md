@@ -4,7 +4,6 @@ conda activate llamax
 git clone https://github.com/AetherCortex/Llama-X.git
 cd Llama-X
 
-# other cuda versions will stuck on watgpu-100 node! Thanks Tunde!
 pip3 install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu121
 python -c 'import torch; print(torch.cuda.is_available())'
 python -c "import torch; print(torch.__version__)"
