@@ -14,7 +14,7 @@ pip install -r requirements.txt
 
 - Training data example (e.g., [Stanford Alpaca](https://github.com/tatsu-lab/stanford_alpaca/blob/main/alpaca_data.json)):
 ```bash
-Llama-X/src/data/alpaca_data.json
+data/alpaca_data.json
 ```
 
 - Convert LLaMA checkpoint to HuggingFace format:
