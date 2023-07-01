@@ -4,14 +4,15 @@ conda activate llamax
 git clone https://github.com/AetherCortex/Llama-X.git
 cd Llama-X
 
-pip3 install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu118
+# other cuda versions will stuck on watgpu-100 node! Thanks Tunde!
+pip3 install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu121
 python -c 'import torch; print(torch.cuda.is_available())'
 python -c "import torch; print(torch.__version__)"
 pip install transformers==4.29.2
 pip install -r requirements.txt
 
-conda install -c "nvidia/label/cuda-12.1.1" cuda # other versions will stuck on watgpu-100 node! Thanks Tunde!
-nvcc --version
+#conda install -c "nvidia/label/cuda-12.1.1" cuda 
+#nvcc --version
 ```
 
 - Training data example (e.g., [Stanford Alpaca](https://github.com/tatsu-lab/stanford_alpaca/blob/main/alpaca_data.json)):
