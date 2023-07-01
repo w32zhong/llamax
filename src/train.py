@@ -195,7 +195,7 @@ def train():
         cache_dir=training_args.cache_dir,
     )
 
-    if False: # enable Lora?
+    if True: # enable Lora?
         TARGET_MODULES = [
             "q_proj",
             "v_proj",
@@ -207,7 +207,7 @@ def train():
             target_modules=TARGET_MODULES,
         )
         model = get_peft_model(model, lora_config)
-        print_trainable_parameters(model)
+        model.print_trainable_parameters()
 
     tokenizer = transformers.AutoTokenizer.from_pretrained(
         model_args.model_name_or_path,

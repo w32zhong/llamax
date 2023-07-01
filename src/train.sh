@@ -3,21 +3,26 @@ export NCCL_BLOCKING_WAIT=1  # Set this variable to use the NCCL backend
 export NCCL_IB_DISABLE=1
 export NCCL_DEBUG=INFO
 export NCCL_P2P_DISABLE=1
-export TORCH_DISTRIBUTED_DEBUG=DETAIL
-#export TORCH_DISTRIBUTED_DEBUG=OFF
+#export TORCH_DISTRIBUTED_DEBUG=DETAIL
+export TORCH_DISTRIBUTED_DEBUG=OFF
 
 #--hostfile configs/hostfile \
 #--num_gpus 8 \
 #--num_nodes 1 \
+
+# Zero-s3 on Ada 6000 (49G) maximum batch sizes:
+#  7B w/o Lora: batch size = 32
+#  30B w/ Lora: batch size = 20
+
 deepspeed \
 	--master_port 8900 \
 	train.py \
-	--model_name_or_path ~/llama-models/7B-hgf/ \
+	--model_name_or_path ~/llama-models/30B-hgf/ \
 	--data_path ../data/alpaca_data.json \
 	--output_dir ./output/ \
 	--num_train_epochs 9 \
 	--model_max_length 2048 \
-	--per_device_train_batch_size 32 \
+	--per_device_train_batch_size 20 \
 	--per_device_eval_batch_size 1 \
 	--gradient_accumulation_steps 1 \
 	--evaluation_strategy "no" \
