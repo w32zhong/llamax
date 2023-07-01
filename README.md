@@ -8,7 +8,7 @@ pip3 install --pre torch torchvision torchaudio --index-url https://download.pyt
 python -c 'import torch; print(torch.cuda.is_available())'
 pip install transformers==4.29.2
 
-conda install cuda -c nvidia/label/cuda-11.4.0
+conda install -c "nvidia/label/cuda-12.1.1" cuda # other versions will stuck on watgpu-100 node! Thanks Tunde!
 pip install -r requirements.txt
 ```
 
