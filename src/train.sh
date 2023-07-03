@@ -17,10 +17,10 @@ export TORCH_DISTRIBUTED_DEBUG=OFF
 deepspeed \
 	--master_port 8900 \
 	train.py \
-	--model_name_or_path ~/llama-models/30B-hgf/ \
+	--model_name_or_path ~/llama-models/7B-hgf/ \
 	--data_path ../data/alpaca_data.json \
 	--output_dir ./output/ \
-	--num_train_epochs 9 \
+	--num_train_epochs 1 \
 	--model_max_length 2048 \
 	--per_device_train_batch_size 12 \
 	--per_device_eval_batch_size 1 \
@@ -36,4 +36,6 @@ deepspeed \
 	--report_to "tensorboard" \
 	--gradient_checkpointing True \
 	--deepspeed configs/deepspeed_config.json \
-	--fp16 True
+	--fp16 True \
+
+	#--max_steps 1

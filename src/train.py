@@ -28,16 +28,6 @@ import utils
 
 ### newly added import:
 from peft import LoraConfig, get_peft_model
-def print_trainable_parameters(model):
-    trainable_params = 0
-    all_param = 1 # avoid dividing-by-zero
-    for _, param in model.named_parameters():
-        all_param += param.numel()
-        if param.requires_grad:
-            trainable_params += param.numel()
-    print(
-        f"trainable params: {trainable_params:,} || all params: {all_param:,} || trainable%: {100 * trainable_params / all_param:,}"
-    )
 
 IGNORE_INDEX = -100
 DEFAULT_PAD_TOKEN = "[PAD]"
@@ -264,9 +254,11 @@ def train():
     trainer = Trainer(model=model, tokenizer=tokenizer, args=training_args, **data_module)
     model.config.use_cache = False
 
+    #trainer.train(resume_from_checkpoint='output.bkup/checkpoint-4600/')
     trainer.train()
     trainer.save_state()
     safe_save_model_for_hf_trainer(trainer=trainer, output_dir=training_args.output_dir)
+    model.save_pretrained(training_args.output_dir + '/adapter')
 
 
 if __name__ == "__main__":

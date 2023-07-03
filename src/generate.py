@@ -2,7 +2,7 @@ import sys
 
 import fire
 import torch
-# from peft import PeftModel
+from peft import PeftModel
 import transformers
 import gradio as gr
 
@@ -25,14 +25,15 @@ except:
 
 def main(
     load_8bit: bool = False,
-    base_model: str = "/path/to/llama-7B/hf/ft/checkpoint-300",
-    # lora_weights: str = "tloen/alpaca-lora-7b",
+    base_model: str = "output/checkpoint-4600/",
+    lora_model: str = "output/adapter",
 ):
     assert base_model, (
         "Please specify a --base_model, e.g. --base_model='decapoda-research/llama-7b-hf'"
     )
 
     tokenizer = LlamaTokenizer.from_pretrained(base_model)
+    print('Loading weights')
     if device == "cuda":
         model = LlamaForCausalLM.from_pretrained(
             base_model,
@@ -40,6 +41,7 @@ def main(
             torch_dtype=torch.float16,
             device_map="auto",
         )
+        model = PeftModel(model, lora_model, torch_dtype=torch.float16) ### new
     elif device == "mps":
         model = LlamaForCausalLM.from_pretrained(
             base_model,
@@ -47,6 +49,7 @@ def main(
             torch_dtype=torch.float16,
         )
 
+    print('Loading weights [done]')
     # unwind broken decapoda-research config
     model.config.pad_token_id = tokenizer.pad_token_id = 0  # unk
     model.config.bos_token_id = 1
