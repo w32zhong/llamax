@@ -1,7 +1,7 @@
 # run with either:
 # (1) python test_llama.py ~/llama-models/7B-hgf/ --direct_inference
 # or
-# (2) deepspeed  --num_gpus 2 test_llama.py ~/llama-models/7B-hgf/
+# (2) deepspeed --num_gpus 2 test_llama.py --world_size 2 ~/llama-models/7B-hgf/
 
 # Also note that CUDA_VISIBLE_DEVICES can’t be used with DeepSpeed to control which devices should be used. To specify devices:
 # Replace --num_gpus ... with --include=localhost:4,5,6,7
@@ -13,9 +13,12 @@ import gradio as gr
 import deepspeed
 from transformers import LlamaTokenizer, LlamaForCausalLM, GenerationConfig
 
+
 def main(model_path, local_rank=0, world_size=1, direct_inference=False):
-    tokenizer = LlamaTokenizer.from_pretrained(model_path)
+    print('RANK:', local_rank, '/', world_size)
+
     print('Loading weights')
+    tokenizer = LlamaTokenizer.from_pretrained(model_path)
     model = LlamaForCausalLM.from_pretrained(
         model_path,
 
@@ -28,10 +31,8 @@ def main(model_path, local_rank=0, world_size=1, direct_inference=False):
         # https://github.com/microsoft/DeepSpeed/issues/3028
     )
 
-    print('RANK:', local_rank, '/', world_size)
-    model.to(f'cuda:{local_rank}')
-
     model.eval()
+    model.to(f'cuda:{local_rank}')
     device = model.device
     print('DEV:', device)
 
@@ -56,6 +57,7 @@ def main(model_path, local_rank=0, world_size=1, direct_inference=False):
         else:
             iface = gr.Interface(fn=inference, inputs="text", outputs="text")
             iface.launch(share=True)
+
 
 if __name__ == '__main__':
     fire.Fire(main)
