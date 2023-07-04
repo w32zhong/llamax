@@ -6,7 +6,11 @@ from transformers import LlamaTokenizer, LlamaForCausalLM, GenerationConfig
 def main(model_path):
     tokenizer = LlamaTokenizer.from_pretrained(model_path)
     print('Loading weights')
-    model = LlamaForCausalLM.from_pretrained(model_path)
+    model = LlamaForCausalLM.from_pretrained(
+        model_path,
+        torch_dtype=torch.float16,
+        #device_map="auto", # buggy!!!
+    )
     model.to('cuda')
     model.eval()
     device = model.device
