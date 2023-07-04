@@ -1,8 +1,11 @@
-# export CUDA_VISIBLE_DEVICES=4,5
 # run with either:
 # (1) python test_llama.py ~/llama-models/7B-hgf/ --direct_inference
 # or
 # (2) deepspeed  --num_gpus 2 test_llama.py ~/llama-models/7B-hgf/
+
+# Also note that CUDA_VISIBLE_DEVICES can’t be used with DeepSpeed to control which devices should be used. To specify devices:
+# Replace --num_gpus ... with --include=localhost:4,5,6,7
+
 import os
 import fire
 import torch
