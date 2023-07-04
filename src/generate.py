@@ -57,7 +57,7 @@ def main(
         **kwargs,
     ):
         prompt = generate_prompt(instruction, input)
-        print(prompt)
+        print('prompt:', prompt)
         inputs = tokenizer(prompt, return_tensors="pt")
         input_ids = inputs["input_ids"].to(device)
         generation_config = GenerationConfig(
@@ -77,7 +77,8 @@ def main(
             )
         s = generation_output.sequences[0]
         output = tokenizer.decode(s)
-        return output.split("### Response:")[1].strip()
+        print('output:', output)
+        return output
 
     gr.Interface(
         fn=evaluate,
@@ -109,7 +110,7 @@ def main(
 
 def generate_prompt(instruction, input=None):
     if input:
-        return f"""{instruction} {input}"""
+        return f"""hello! {instruction} {input}"""
     else:
         return f"""Below is an instruction that describes a task. Write a response that appropriately completes the request."""
 
