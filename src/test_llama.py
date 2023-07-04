@@ -6,26 +6,21 @@ from transformers import LlamaTokenizer, LlamaForCausalLM, GenerationConfig
 def main(model_path):
     tokenizer = LlamaTokenizer.from_pretrained(model_path)
     print('Loading weights')
-    model = LlamaForCausalLM.from_pretrained(
-        model_path,
-        torch_dtype=torch.float16,
-        device_map="auto",
-    )
+    model = LlamaForCausalLM.from_pretrained(model_path)
+    model.to('cuda')
     model.eval()
-    device = 'cuda'
-    model.half()  # seems to fix bugs for some users.
+    device = model.device
 
-    def inference(prompt='hello! we are'):
+    def inference(prompt='My name is Mariama, my favorite'):
         print('prompt:', prompt)
         inputs = tokenizer(prompt, return_tensors="pt")
         input_ids = inputs["input_ids"].to(device)
         with torch.no_grad():
             generation_output = model.generate(
                 input_ids=input_ids,
-                return_dict_in_generate=True,
-                output_scores=True
+                max_new_tokens=128
             )
-        output = tokenizer.decode(generation_output.sequences[0])
+        output = tokenizer.decode(generation_output[0])
         print('output:', output)
         return output
 
