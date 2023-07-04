@@ -5,10 +5,6 @@ import torch
 from peft import PeftModel
 import transformers
 import gradio as gr
-
-assert (
-    "LlamaTokenizer" in transformers._import_structure["models.llama"]
-), "LLaMA is now in HuggingFace's main branch.\nPlease reinstall it: pip uninstall transformers && pip install git+https://github.com/huggingface/transformers.git"
 from transformers import LlamaTokenizer, LlamaForCausalLM, GenerationConfig
 
 if torch.cuda.is_available():
@@ -16,22 +12,12 @@ if torch.cuda.is_available():
 else:
     device = "cpu"
 
-try:
-    if torch.backends.mps.is_available():
-        device = "mps"
-except:
-    pass
-
 
 def main(
     load_8bit: bool = False,
-    base_model: str = "output/checkpoint-3200/",
-    lora_model: str = "output/adapter",
+    base_model: str = "output/merged/",
+    #lora_model: str = "output/adapter",
 ):
-    assert base_model, (
-        "Please specify a --base_model, e.g. --base_model='decapoda-research/llama-7b-hf'"
-    )
-
     tokenizer = LlamaTokenizer.from_pretrained(base_model)
     print('Loading weights')
     if device == "cuda":
@@ -41,15 +27,11 @@ def main(
             torch_dtype=torch.float16,
             device_map="auto",
         )
-        model = PeftModel.from_pretrained(
-            model, lora_model, torch_dtype=torch.float16
-        )
-    elif device == "mps":
-        model = LlamaForCausalLM.from_pretrained(
-            base_model,
-            device_map={"": device},
-            torch_dtype=torch.float16,
-        )
+        #model = PeftModel.from_pretrained(
+        #    model, lora_model, torch_dtype=torch.float16
+        #)
+    else:
+        assert False
 
     print('Loading weights [done]')
     # unwind broken decapoda-research config
@@ -57,12 +39,12 @@ def main(
     model.config.bos_token_id = 1
     model.config.eos_token_id = 2
 
-    if not load_8bit:
-        model.half()  # seems to fix bugs for some users.
+    #if not load_8bit:
+    #    model.half()  # seems to fix bugs for some users.
 
     model.eval()
-    if torch.__version__ >= "2" and sys.platform != "win32":
-        model = torch.compile(model)
+    #if torch.__version__ >= "2" and sys.platform != "win32":
+    #    model = torch.compile(model)
 
     def evaluate(
         instruction,
@@ -75,6 +57,7 @@ def main(
         **kwargs,
     ):
         prompt = generate_prompt(instruction, input)
+        print(prompt)
         inputs = tokenizer(prompt, return_tensors="pt")
         input_ids = inputs["input_ids"].to(device)
         generation_config = GenerationConfig(
@@ -126,24 +109,9 @@ def main(
 
 def generate_prompt(instruction, input=None):
     if input:
-        return f"""Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
-
-### Instruction:
-{instruction}
-
-### Input:
-{input}
-
-### Response:
-"""
+        return f"""{instruction} {input}"""
     else:
-        return f"""Below is an instruction that describes a task. Write a response that appropriately completes the request.
-
-### Instruction:
-{instruction}
-
-### Response:
-"""
+        return f"""Below is an instruction that describes a task. Write a response that appropriately completes the request."""
 
 
 if __name__ == "__main__":
