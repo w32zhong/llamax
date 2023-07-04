@@ -20,7 +20,7 @@ deepspeed \
 	--model_name_or_path ~/llama-models/7B-hgf/ \
 	--data_path ../data/alpaca_data.json \
 	--output_dir ./output/ \
-	--num_train_epochs 1 \
+	--num_train_epochs 3 \
 	--model_max_length 2048 \
 	--per_device_train_batch_size 12 \
 	--per_device_eval_batch_size 1 \

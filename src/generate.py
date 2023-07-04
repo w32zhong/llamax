@@ -25,7 +25,7 @@ except:
 
 def main(
     load_8bit: bool = False,
-    base_model: str = "output/checkpoint-4600/",
+    base_model: str = "output/checkpoint-3200/",
     lora_model: str = "output/adapter",
 ):
     assert base_model, (
@@ -41,7 +41,9 @@ def main(
             torch_dtype=torch.float16,
             device_map="auto",
         )
-        model = PeftModel(model, lora_model, torch_dtype=torch.float16) ### new
+        model = PeftModel.from_pretrained(
+            model, lora_model, torch_dtype=torch.float16
+        )
     elif device == "mps":
         model = LlamaForCausalLM.from_pretrained(
             base_model,
