@@ -33,9 +33,20 @@ ps -up `nvidia-smi -q -x | grep -Po '(?<=<pid>)[0-9]+'`
 
 - Inference
 ```bash
-# web demo inference
 python generate.py
-
-# batch inference
-To Do
+```
+Conversion of Weights
+```
+>>> import torch                                                                                                                                                             
+>>> m=torch.load('output/checkpoint-3200/pytorch_model.bin')                                                                                                                 
+>>> n=torch.load('output/adapter/adapter_model.bin')                                                                                                                         
+>>>                                                                                                                                                                          
+>>> n = n['base_model.model.model.layers.31.self_attn.q_proj.lora_A.weight'].to('cpu')                                                                                       
+KeyboardInterrupt                                                                                                                                                            
+>>> m = m['base_model.model.model.layers.31.self_attn.q_proj.lora_A.default.weight']                                                                                         
+KeyboardInterrupt                                                                                                                                                            
+>>> list(filter(lambda x: '31' in x, n.keys()))                                                                                                                              
+['base_model.model.model.layers.31.self_attn.q_proj.lora_A.weight', 'base_model.model.model.layers.31.self_attn.q_proj.lora_B.weight', 'base_model.model.model.layers.31.self_attn.v_proj.lora_A.weight', 'base_model.model.model.layers.31.self_attn.v_proj.lora_B.weight']                                                                              
+>>> list(filter(lambda x: '31' in x, m.keys()))                                                                                                                              
+['base_model.model.model.layers.31.self_attn.q_proj.weight', 'base_model.model.model.layers.31.self_attn.q_proj.lora_A.default.weight', 'base_model.model.model.layers.31.self_attn.q_proj.lora_B.default.weight', 'base_model.model.model.layers.31.self_attn.k_proj.weight', 'base_model.model.model.layers.31.self_attn.v_proj.weight', 'base_model.model.model.layers.31.self_attn.v_proj.lora_A.default.weight', 'base_model.model.model.layers.31.self_attn.v_proj.lora_B.default.weight', 'base_model.model.model.layers.31.self_attn.o_proj.weight', 'base_model.model.model.layers.31.self_attn.rotary_emb.inv_freq', 'base_model.model.model.layers.31.mlp.gate_proj.weight', 'base_model.model.model.layers.31.mlp.down_proj.weight', 'base_model.model.model.layers.31.mlp.up_proj.weight', 'base_model.model.model.layers.31.input_layernorm.weight', 'base_model.model.model.layers.31.post_attention_layernorm.weight'] 
 ```
