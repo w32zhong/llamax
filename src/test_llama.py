@@ -16,19 +16,20 @@ from transformers import LlamaTokenizer, LlamaForCausalLM, LlamaConfig
 from transformers.models.llama.modeling_llama import LlamaDecoderLayer
 from accelerate import infer_auto_device_map, dispatch_model, init_empty_weights, load_checkpoint_in_model
 
-no_split_module_classes = LlamaForCausalLM._no_split_modules
-
 
 def main(model_path, local_rank=0, world_size=1,
     dtype='fp16', direct_inference=False):
     print('RANK:', local_rank, '/', world_size)
 
+    load_in_8bit = False
     dtype_dict = {
         'fp32': torch.float,
         'fp16': torch.half,
         'bp16': torch.bfloat16,
-        'i8': torch.int8,
     }
+    if dtype == 'fp8':
+        dtype = 'bp16'
+        load_in_8bit = True
     model_dtype = dtype_dict[dtype]
     print('DTYPE:', model_dtype)
 
@@ -38,21 +39,7 @@ def main(model_path, local_rank=0, world_size=1,
     torch.cuda.empty_cache()
     gc.collect()
 
-    #with deepspeed.OnDevice(dtype=model_dtype, device=f'cuda:{local_rank}'):
-
-    config = LlamaConfig.from_pretrained(model_path)
-    with init_empty_weights():
-        model = LlamaForCausalLM._from_config(
-            config,
-            torch_dtype=model_dtype,
-
-            # device_map="auto", # buggy!!! And we should not use both
-            # device_map="auto" and deepspeed.init_inference() together.
-            # The former is supported by Accelerate:
-            # https://github.com/microsoft/DeepSpeed/issues/3028
-        )
-
-    device_map = infer_auto_device_map(model, max_memory={
+    max_memory = {
         0: "5GiB",
         1: "5GiB",
         2: "5GiB",
@@ -61,17 +48,19 @@ def main(model_path, local_rank=0, world_size=1,
         5: "5GiB",
         6: "5GiB",
         7: "5GiB",
-        "cpu": "200GiB"
-    }, no_split_module_classes=no_split_module_classes)
-    if local_rank == 0:
-        print(device_map)
+    }
 
-    load_checkpoint_in_model(model,
-        model_path,
-        device_map=device_map,
-        offload_folder="offload"
-    )
-    model = dispatch_model(model, device_map=device_map)
+    with init_empty_weights():
+        model = LlamaForCausalLM.from_pretrained(
+            model_path,
+            device_map="auto",
+            offload_folder="offload",
+            torch_dtype=model_dtype,
+            load_in_8bit=load_in_8bit,
+            #max_memory=max_memory
+        )
+    if local_rank == 0:
+        print(model.hf_device_map)
 
     deepspeed.init_distributed(rank=local_rank, world_size=world_size)
 
