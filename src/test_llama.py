@@ -33,11 +33,11 @@ def main(model_path, local_rank=0, world_size=1,
     model_dtype = dtype_dict[dtype]
     print('DTYPE:', model_dtype)
 
-    print('Loading weights')
-    tokenizer = LlamaTokenizer.from_pretrained(model_path)
-
     torch.cuda.empty_cache()
     gc.collect()
+
+    print('Loading weights')
+    tokenizer = LlamaTokenizer.from_pretrained(model_path)
 
     max_memory = {
         0: "5GiB",
@@ -83,7 +83,8 @@ def main(model_path, local_rank=0, world_size=1,
         with torch.no_grad():
             generation_output = model.generate(
                 input_ids=input_ids,
-                max_new_tokens=128
+                max_new_tokens=128,
+                do_sample=False
             )
         output = tokenizer.decode(generation_output[0])
         print(f'rank#{local_rank} output:', output)
