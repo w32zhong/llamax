@@ -1,4 +1,4 @@
-export CUDA_VISIBLE_DEVICES=0,1,2,3
+export CUDA_VISIBLE_DEVICES=4,5
 export NCCL_BLOCKING_WAIT=1  # Set this variable to use the NCCL backend
 export NCCL_IB_DISABLE=1
 export NCCL_DEBUG=INFO
@@ -15,9 +15,9 @@ export TORCH_DISTRIBUTED_DEBUG=OFF
 #  30B w/ Lora: batch size = 20
 
 deepspeed \
-	--master_port 8900 \
+	--master_port 8920 \
 	train.py \
-	--model_name_or_path ~/llama-models/7B-hgf/ \
+	--model_name_or_path ~/llama-models/7B-hgf-new/ \
 	--data_path ../data/alpaca_data.json \
 	--output_dir ./output/ \
 	--num_train_epochs 3 \
