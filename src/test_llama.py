@@ -50,15 +50,14 @@ def main(model_path, local_rank=0, world_size=1,
         7: "5GiB",
     }
 
-    with init_empty_weights():
-        model = LlamaForCausalLM.from_pretrained(
-            model_path,
-            device_map="auto",
-            offload_folder="offload",
-            torch_dtype=model_dtype,
-            load_in_8bit=load_in_8bit,
-            #max_memory=max_memory
-        )
+    model = LlamaForCausalLM.from_pretrained(
+        model_path,
+        device_map="auto",
+        offload_folder="offload",
+        torch_dtype=model_dtype,
+        load_in_8bit=load_in_8bit,
+        #max_memory=max_memory
+    )
     if local_rank == 0:
         print(model.hf_device_map)
 
