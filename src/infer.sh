@@ -7,11 +7,11 @@ export TORCH_DISTRIBUTED_DEBUG=OFF
 
 #export PYTHONPATH=`pwd`/accelerate/src/
 
-#deepspeed --include=localhost:0 test_llama.py --world_size 1 ~/llama-models/7B-hgf-new --direct_inference --dtype fp8
+#deepspeed --include=localhost:0 test_llama.py --world_size 1 ~/llama-models/7B-hgf-new --direct_inference
 
 #deepspeed --include=localhost:0 test_llama.py --world_size 1 ~/llama-models/13B-hgf-new --direct_inference --dtype fp8
 
-deepspeed --include=localhost:0,1,2,3 test_llama.py --world_size 4 ~/llama-models/7B-hgf-new --direct_inference
+#deepspeed --include=localhost:0,1,2,3 test_llama.py --world_size 4 ~/llama-models/7B-hgf-new --direct_inference
 
 #deepspeed --include=localhost:0 test_llama.py --world_size 1 ~/llama-models/30B-hgf --dtype fp8 --direct_inference
 
@@ -21,3 +21,11 @@ deepspeed --include=localhost:0,1,2,3 test_llama.py --world_size 4 ~/llama-model
 
 #deepspeed --include=localhost:0,1,2 test_llama.py --world_size 3 ~/llama-models/65B-hgf-new --dtype fp8 --direct_inference 
 
+
+python3 -m torch.distributed.launch \
+    --master_addr localhost \
+    --master_port 8981 \
+    --nproc_per_node 2 \
+    --nnodes 1 \
+    --node_rank 0 \
+    test_bmb.py ./bmb_llama/ --token_path=~/llama-models/30B-hgf --debug

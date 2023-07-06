@@ -22,7 +22,6 @@ def conv_hug2bmb(inpath, outpath='bmb_llama'):
         'num_layers': hf_config.num_hidden_layers,
         'num_heads': hf_config.num_attention_heads,
         'dim_head': hf_config.hidden_size // hf_config.num_attention_heads,
-        #'vocab_size': hf_config.vocab_size,
     }
 
     with open(os.path.join(inpath, "pytorch_model.bin.index.json"), 'r') as f:
@@ -37,8 +36,10 @@ def conv_hug2bmb(inpath, outpath='bmb_llama'):
         model_hf.update(part)
 
     out = OrderedDict()
+    copied = dict()
     def copy(new_key, old_key):
         out[new_key] = model_hf[old_key].contiguous().half()
+        copied[old_key] = True
     copy("input_embedding.weight", 'model.embed_tokens.weight')
     copy("encoder.output_layernorm.weight", 'model.norm.weight')
     copy('output_projection.weight', 'lm_head.weight')
@@ -88,6 +89,10 @@ def conv_hug2bmb(inpath, outpath='bmb_llama'):
         os.path.join(outpath, "special_tokens_map.json")
     )
 
+    all_keys = set(model_hf.keys())
+    copied_keys = set(copied.keys())
+    diff_keys = all_keys.difference(copied_keys)
+    print('diff_keys:', diff_keys)
     torch.save(out, os.path.join(outpath, "pytorch_model.pt"))
 
 
@@ -114,7 +119,7 @@ def inference(model_path, **kargs):
             timeout=datetime.timedelta(0, 5 * 60),
         )
 
-    bmt.init_distributed(seed=0, zero_level=zero_level)
+    bmt.init_distributed(seed=123)
     config = LlamaConfig.from_pretrained(model_path)
     tokenizer = LlamaTokenizer.from_pretrained(token_path)
     model = Llama(config)
@@ -139,5 +144,5 @@ def inference(model_path, **kargs):
 
 if __name__ == "__main__":
     import fire
-    fire.Fire(inference)
-    #fire.Fire(conv_hug2bmb)
+    #fire.Fire(inference)
+    fire.Fire(conv_hug2bmb)
